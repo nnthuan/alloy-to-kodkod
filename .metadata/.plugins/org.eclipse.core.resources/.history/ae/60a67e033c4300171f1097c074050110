@@ -1,0 +1,100 @@
+package Controller;
+
+import controller.Rule;
+import java.lang.String;
+import java.util.List;
+import kodkod.ast.Formula;
+import kodkod.ast.Relation;
+import kodkod.ast.Variable;
+
+public class Rule4checkDestroy extends Rule {
+  private List<String> listGameObjectName;
+
+  private Relation Time;
+
+  private Relation Obstacles;
+
+  private Relation DESTROY;
+
+  private Relation score;
+
+  private Relation weapons_state;
+
+  public Rule4checkDestroy() {
+    this.Time = Relation.unary("Time");
+    this.Obstacles = Relation.unary("Obstacles");
+    this.DESTROY = Relation.unary("DESTROY");
+    listGameObjectName.Add("Time");
+    listGameObjectName.Add("Obstacles");
+    listGameObjectName.Add("DESTROY");
+    this.score = Relation.unary("score");
+    this.weapons_state = Relation.unary("weapons_state");
+  }
+
+  public Rule4checkDestroy(Relation time, Relation obstacles, Relation destroy, Relation score, Relation weapons_state) {
+    this.Time = time;
+    this.Obstacles = obstacles;
+    this.DESTROY = destroy;
+    listGameObjectName.Add("Time");
+    listGameObjectName.Add("Obstacles");
+    listGameObjectName.Add("DESTROY");
+    this.score = score;
+    this.weapons_state = weapons_state;
+  }
+
+  public Relation getTime() {
+    return this.Time;
+  }
+
+  public void setTime(Relation time) {
+    this.Time = time;
+  }
+
+  public Relation getObstacles() {
+    return this.Obstacles;
+  }
+
+  public void setObstacles(Relation obstacles) {
+    this.Obstacles = obstacles;
+  }
+
+  public Relation getDESTROY() {
+    return this.DESTROY;
+  }
+
+  public void setDESTROY(Relation destroy) {
+    this.DESTROY = destroy;
+  }
+
+  public Relation getScore() {
+    return this.score;
+  }
+
+  public void setScore(Relation score) {
+    this.score = score;
+  }
+
+  public Relation getWeapons_state() {
+    return this.weapons_state;
+  }
+
+  public void setWeapons_state(Relation weapons_state) {
+    this.weapons_state = weapons_state;
+  }
+
+  @Variable
+  public Formula execute() {
+    private Variable t = Variable.unary("t");
+    private Variable o = Variable.unary("o");
+    private Formula f0 = o.join(score.join(t).eq(5).implies(o.join(weapons_state.join(t).eq(DESTROY))));
+    private Formula f1 = f0.forAll(t.oneOf(Time).and(o.oneOf(Obstacles)));
+    return f1;
+  }
+
+  public void addGameObject(GameObject gameObject) {
+    if(gameObject != null){
+    if(!gameObjects.contains(gameObject)){
+    gameObjects.add(gameObject);
+    }}
+  }
+}

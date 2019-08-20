@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="GenerateRule.GenerateGameObjectClass"/>
+<fullyQualifiedTypeName name="com.squareup.javapoet.ParameterizedTypeName"/>
+<fullyQualifiedTypeName name="com.squareup.javapoet.FieldSpec.Builder"/>
+<fullyQualifiedTypeName name="kodkod.ast.Variable"/>
+<fullyQualifiedTypeName name="com.squareup.javapoet.TypeVariableName"/>
+<fullyQualifiedTypeName name="com.squareup.javapoet.TypeName"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+</qualifiedTypeNameHistroy>

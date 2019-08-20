@@ -1,0 +1,12 @@
+package test;
+
+import GenerateRule.GenerateGameObjectClass;
+
+public class test01 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		GenerateGameObjectClass geGameObject = new GenerateGameObjectClass();
+	}
+
+}

@@ -1,0 +1,163 @@
+package Controller;
+
+import controller.Rule;
+import java.lang.String;
+import java.util.List;
+import kodkod.ast.Formula;
+import kodkod.ast.Relation;
+import kodkod.ast.Variable;
+
+public class Rule4checkHit extends Rule {
+  private List<String> listGameObjectName;
+
+  private Relation Time;
+
+  private Relation Obstacles;
+
+  private Relation Fighter;
+
+  private Relation DESTROY;
+
+  private Relation position;
+
+  private Relation x;
+
+  private Relation y;
+
+  private Relation weapons_state;
+
+  private Relation resource;
+
+  private Relation score;
+
+  public Rule4checkHit() {
+    this.Time = Relation.unary("Time");
+    this.Obstacles = Relation.unary("Obstacles");
+    this.Fighter = Relation.unary("Fighter");
+    this.DESTROY = Relation.unary("DESTROY");
+    listGameObjectName.Add("Time");
+    listGameObjectName.Add("Obstacles");
+    listGameObjectName.Add("Fighter");
+    listGameObjectName.Add("DESTROY");
+    this.position = Relation.unary("position");
+    this.x = Relation.unary("x");
+    this.y = Relation.unary("y");
+    this.weapons_state = Relation.unary("weapons_state");
+    this.resource = Relation.unary("resource");
+    this.score = Relation.unary("score");
+  }
+
+  public Rule4checkHit(Relation time, Relation obstacles, Relation fighter, Relation destroy, Relation position, Relation x, Relation y, Relation weapons_state, Relation resource, Relation score) {
+    this.Time = time;
+    this.Obstacles = obstacles;
+    this.Fighter = fighter;
+    this.DESTROY = destroy;
+    listGameObjectName.Add("Time");
+    listGameObjectName.Add("Obstacles");
+    listGameObjectName.Add("Fighter");
+    listGameObjectName.Add("DESTROY");
+    this.position = position;
+    this.x = x;
+    this.y = y;
+    this.weapons_state = weapons_state;
+    this.resource = resource;
+    this.score = score;
+  }
+
+  public Relation getTime() {
+    return this.Time;
+  }
+
+  public void setTime(Relation time) {
+    this.Time = time;
+  }
+
+  public Relation getObstacles() {
+    return this.Obstacles;
+  }
+
+  public void setObstacles(Relation obstacles) {
+    this.Obstacles = obstacles;
+  }
+
+  public Relation getFighter() {
+    return this.Fighter;
+  }
+
+  public void setFighter(Relation fighter) {
+    this.Fighter = fighter;
+  }
+
+  public Relation getDESTROY() {
+    return this.DESTROY;
+  }
+
+  public void setDESTROY(Relation destroy) {
+    this.DESTROY = destroy;
+  }
+
+  public Relation getPosition() {
+    return this.position;
+  }
+
+  public void setPosition(Relation position) {
+    this.position = position;
+  }
+
+  public Relation getX() {
+    return this.x;
+  }
+
+  public void setX(Relation x) {
+    this.x = x;
+  }
+
+  public Relation getY() {
+    return this.y;
+  }
+
+  public void setY(Relation y) {
+    this.y = y;
+  }
+
+  public Relation getWeapons_state() {
+    return this.weapons_state;
+  }
+
+  public void setWeapons_state(Relation weapons_state) {
+    this.weapons_state = weapons_state;
+  }
+
+  public Relation getResource() {
+    return this.resource;
+  }
+
+  public void setResource(Relation resource) {
+    this.resource = resource;
+  }
+
+  public Relation getScore() {
+    return this.score;
+  }
+
+  public void setScore(Relation score) {
+    this.score = score;
+  }
+
+  @Variable
+  public Formula execute() {
+    private Variable t = Variable.unary("t");
+    private Variable o = Variable.unary("o");
+    private Variable f = Variable.unary("f");
+    private Formula f0 = f.join(position.join(x.join(t).eq(o.join(position.join(x.join(t).and(f.join(position.join(y.join(t).eq(o.join(position.join(y.join(t).implies(o.join(weapons_state.join(t).eq(DESTROY).and(f.join(resource.join(t).eq(plus[f.join(resource.join(t)),o.join(score.join(t))]))))))))))))))));
+    private Formula f1 = f0.forAll(t.oneOf(Time).and(o.oneOf(Obstacles).and(f.oneOf(Fighter))));
+    return f1;
+  }
+
+  public void addGameObject(GameObject gameObject) {
+    if(gameObject != null){
+    if(!gameObjects.contains(gameObject)){
+    gameObjects.add(gameObject);
+    }}
+  }
+}

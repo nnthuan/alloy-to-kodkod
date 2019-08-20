@@ -1,0 +1,442 @@
+package GenerateRule;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import edu.mit.csail.sdg.alloy4.SafeList;
+import edu.mit.csail.sdg.alloy4compiler.ast.Sig;
+import edu.mit.csail.sdg.alloy4compiler.ast.Sig.Field;
+
+public class TransToKodKod {
+	List<String> sigNames = new ArrayList<String>();
+	List<String> fieldNames = new ArrayList<String>();
+	List<String> formulas = new ArrayList<String>();
+	List<String> varNames = new ArrayList<String>();
+	String factName = "";
+	String result = "";
+
+	public String getResult() {
+		return result;
+	}
+
+	public List<String> getSigNames() {
+		return sigNames;
+	}
+
+	public List<String> getFieldNames() {
+		return fieldNames;
+	}
+
+	public List<String> getFormulas() {
+		return formulas;
+	}
+
+	public List<String> getVarNames() {
+		return varNames;
+	}
+
+	public String getFactName() {
+		return factName;
+	}
+
+	public TransToKodKod() {
+	}
+
+	public void execute(List<String> factArr, SafeList<Sig> sigs, String path) {
+
+		String _temp = "";
+		String _formula = "";
+		String _sig = "";
+
+		int _point = 0;
+		int _indexEnd = factArr.size();
+		int _countBrackets = 0;
+		int _countInBrackets = 0;
+
+		OperatorRepositories _operator = new OperatorRepositories();
+
+		boolean flag = false;
+		boolean flagBracket = false;
+
+		while (_point < _indexEnd) {
+			_sig = "";
+			_temp = factArr.get(_point);
+			// first break point
+			if (_temp.equals("}")) {
+				if (_countBrackets > 0) {
+					while (_countBrackets > 0) {
+						_formula += ")";
+						_countBrackets--;
+					}
+				}
+				if (_formula != "") {
+					if (Character.toString(_formula.charAt(0)).equals("."))
+						_formula = _formula.substring(1);
+				}
+				formulas.add(_formula);
+				_formula = "";
+				_temp = "";
+				break;
+			}
+
+			// second bread point
+			if (_temp.equals("|")) {
+				// close Parenthesis
+				if (_countBrackets > 0) {
+					while (_countBrackets > 0) {
+						_formula += ")";
+						_countBrackets--;
+					}
+				}
+				if (_formula != "") {
+					if (Character.toString(_formula.charAt(0)).equals("."))
+						_formula = _formula.substring(1);
+				}
+				formulas.add(_formula);
+				_formula = "";
+				_temp = "";
+				if (_point < _indexEnd - 1) {
+					_point++;
+				}
+				if (_point < _indexEnd - 1) {
+					_temp = factArr.get(_point);
+				}
+			}
+			// key word
+			if (isReservedWords(_temp)) {
+				// one, some, lone
+				if (_temp.equals("one") || _temp.equals("some") || _temp.equals("lone")) {
+					if (_point < _indexEnd - 3) {
+						_sig = factArr.get(_point) + " " + factArr.get(_point + 1) + " " + factArr.get(_point + 2) + " "
+								+ factArr.get(_point + 3);
+						if (Pattern.matches(SyntaxRegulars.getRegQuantified(), _sig)) {
+							_formula += ".";
+							_formula += "for" + UpperCaseCharFirst(_temp);
+							_formula += "(";
+							if (flagBracket == true) {
+								_countInBrackets++;
+							} else {
+								_countBrackets++;
+							}
+							if (_point < _indexEnd - 1)
+								_point++;
+							_sig = "";
+						}
+					}
+					if (_point >= 2 && _point < _indexEnd - 1) {
+						_sig = factArr.get(_point - 2) + " " + factArr.get(_point - 1) + " " + factArr.get(_point) + " "
+								+ factArr.get(_point + 1);
+						if (Pattern.matches(SyntaxRegulars.getRegMultiplicities(), _sig)) {
+							_formula += ".";
+							_formula += _temp + "Of";
+							_formula += "(";
+							if (flagBracket == true)
+								_countInBrackets++;
+							else
+								_countBrackets++;
+							if (_point < _indexEnd - 1)
+								_point++;
+							_sig = "";
+						}
+					}
+				}
+				// all, no
+				else if (_temp.equals("all") || _temp.equals("no")) {
+					_formula += ".";
+					_formula += "for" + UpperCaseCharFirst(_temp);
+					_formula += "(";
+					if (flagBracket == true)
+						_countInBrackets++;
+					else
+						_countBrackets++;
+					if (_point < _indexEnd - 1)
+						_point++;
+				}
+				// set
+				else if (_temp.equals("set")) {
+					_formula += ".";
+					_formula += _temp + "Of";
+					_formula += "(";
+					if (flagBracket == true)
+						_countInBrackets++;
+					else
+						_countBrackets++;
+					if (_point < _indexEnd - 1)
+						_point++;
+				} else if (_temp.equals("fact")) {
+					_point++;
+					factName = factArr.get(_point);
+					_point++;
+				} else {
+					_formula += ".";
+					_formula += _temp;
+					_formula += "(";
+					if (flagBracket == true)
+						_countInBrackets++;
+					else
+						_countBrackets++;
+					if (_point < _indexEnd - 1)
+						_point++;
+				}
+
+			}
+			// ---
+			else {
+				// operator
+				_operator.execute(_temp);
+				if (_operator.getType() != null) {
+					if (_temp.equals("=")) {
+						_formula += ".";
+						_formula += "eq";
+						_formula += "(";
+						if (flagBracket == true)
+							_countInBrackets++;
+						else
+							_countBrackets++;
+						if (_point < _indexEnd - 1)
+							_point++;
+					} else {
+						_formula += ".";
+						_formula += _operator.getExprOperator().toLowerCase();
+						_formula += "(";
+						if (flagBracket == true)
+							_countInBrackets++;
+						else
+							_countBrackets++;
+						if (_point < _indexEnd - 1)
+							_point++;
+					}
+				}
+				// order
+				else {
+					// :
+					if (_temp.equals(":") && !factArr.get(_point + 1).equals("one")
+							&& !factArr.get(_point + 1).equals("lone") && !factArr.get(_point + 1).equals("some")
+							&& !factArr.get(_point + 1).equals("set")) {
+						_formula += ".";
+						_formula += "oneOf";
+						_formula += "(";
+						if (flagBracket == true)
+							_countInBrackets++;
+						else
+							_countBrackets++;
+						if (_point < _indexEnd - 1)
+							_point++;
+					}
+					// (, [
+					else if (_temp.equals("[")) {
+						flagBracket = true;
+						_formula += _temp;
+						if (_point < _indexEnd - 1)
+							_point++;
+					}
+					// ]
+					else if (_temp.equals("]")) {
+						if (flagBracket == true) {
+							if (_countInBrackets > 0) {
+								while (_countInBrackets > 0) {
+									_formula += ")";
+									_countInBrackets--;
+								}
+							}
+						}
+						_formula += _temp;
+						flagBracket = false;
+						if (_point < _indexEnd - 1)
+							_point++;
+					}
+					// ,
+					else if (_temp.equals(",")) {
+						if (flagBracket == false) {
+							_formula += ".";
+							_formula += "and";
+							_formula += "(";
+							_countBrackets++;
+						} else if (flagBracket == true) {
+							if (_countInBrackets > 0) {
+								while (_countInBrackets > 0) {
+									_formula += ")";
+									_countInBrackets--;
+								}
+							}
+							_formula += _temp;
+						}
+						if (_point < _indexEnd - 1)
+							_point++;
+					}
+					// "
+					else if (_temp.equals("\"")) {
+						if (!flag) {
+							flag = true;
+							_formula += _temp;
+							if (_point < _indexEnd - 1)
+								_point++;
+
+						} else {
+							_formula += _temp;
+							if (flagBracket == true) {
+								if (_countInBrackets > 0) {
+									_formula += ")";
+									_countInBrackets--;
+								}
+							} else {
+								if (_countBrackets > 0) {
+									_formula += ")";
+									_countBrackets--;
+								}
+							}
+
+							if (_point < _indexEnd - 1)
+								_point++;
+						}
+					}
+					// number
+					else if (Pattern.matches("\\d*", _temp)) {
+						_formula += _temp;
+						if (_countBrackets > 0) {
+							_formula += ")";
+							if (flagBracket == true)
+								_countInBrackets--;
+							else
+								_countBrackets--;
+						}
+						if (_point < _indexEnd - 1)
+							_point++;
+					} else if (_temp.equals("{")) {
+						if (_point < _indexEnd - 1)
+							_point++;
+					} else {
+						// variable , instance
+						if (factArr.get(_point + 1).equals(":")) {
+							if (!varNames.contains(_temp)) {
+								varNames.add(_temp);
+							}
+							_formula += _temp;
+
+							if (_point < _indexEnd - 1)
+								_point++;
+						}
+						// sig
+						else if (isSig(sigs, _temp)) {
+
+							if (!sigNames.contains(_temp)) {
+								sigNames.add(_temp);
+							}
+							_formula += _temp;
+							if (flagBracket == true) {
+								if (_countInBrackets > 0) {
+									_formula += ")";
+									_countInBrackets--;
+								}
+							} else {
+								if (_countBrackets > 0) {
+									_formula += ")";
+									_countBrackets--;
+								}
+							}
+
+							if (_point < _indexEnd - 1)
+								_point++;
+						}
+						// field
+						else if (isField(sigs, _temp)) {
+							if (!fieldNames.contains(_temp)) {
+								fieldNames.add(_temp);
+							}
+
+							_formula += _temp;
+							if (!factArr.get(_point + 1).equals(".")) {
+								_formula += ")";
+								if (flagBracket == true)
+									_countInBrackets--;
+								else
+									_countBrackets--;
+							}
+							if (_point < _indexEnd - 1)
+								_point++;
+						}
+						// variable or instance had
+						else if (isVarOrInstance(_temp)) {
+							_formula += _temp;
+
+							if (!factArr.get(_point + 1).equals(".") && !factArr.get(_point + 1).equals(":")) {
+								_formula += ")";
+								if (flagBracket == true)
+									_countInBrackets--;
+								else
+									_countBrackets--;
+							}
+
+							if (_point < _indexEnd - 1)
+								_point++;
+						} else {
+							_formula += _temp;
+							if (_point < _indexEnd - 1)
+								_point++;
+						}
+					}
+				}
+			}
+
+		}
+		// out but
+		try {
+			GenerateRuleBasic ruleBasic = new GenerateRuleBasic();
+			ruleBasic.execute(path);
+			GenerateGameObjectClass gameObjectClass = new GenerateGameObjectClass();
+			GenerateRuleClass.exetute(factName, sigNames, fieldNames, varNames, formulas, path);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private boolean isSig(SafeList<Sig> sigs, String str) {
+		for (Sig sigItem : sigs) {
+			if (str.equals(sigItem.label.substring(5))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isReservedWords(String str) {
+		for (EReservedWords item : EReservedWords.values()) {
+			if (item.toString().equals(str.toUpperCase()))
+				return true;
+		}
+		return false;
+	}
+
+	private boolean isField(SafeList<Sig> sigs, String fieldName) {
+		if (sigs == null)
+			return false;
+		for (Sig sigItem : sigs) {
+			for (Field f : sigItem.getFields()) {
+				if (f.label.equals(fieldName)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean isVarOrInstance(String var) {
+		for (String v : varNames) {
+			if (var.equals(v))
+				return true;
+		}
+		return false;
+	}
+
+	private String UpperCaseCharFirst(String str) {
+		StringBuffer stringbf = new StringBuffer();
+		Matcher m = Pattern.compile("([a-z])([a-z]*)", Pattern.CASE_INSENSITIVE).matcher(str);
+		while (m.find()) {
+			m.appendReplacement(stringbf, m.group(1).toUpperCase() + m.group(2).toLowerCase());
+		}
+		return m.appendTail(stringbf).toString();
+	}
+}

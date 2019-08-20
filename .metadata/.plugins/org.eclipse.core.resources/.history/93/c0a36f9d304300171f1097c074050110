@@ -1,0 +1,9 @@
+package GenerateRule;
+/**
+ *Generate class GameObject 
+ **/
+public class GenerateGameObjectClass {
+	public void execute(String path){
+		
+	}
+}

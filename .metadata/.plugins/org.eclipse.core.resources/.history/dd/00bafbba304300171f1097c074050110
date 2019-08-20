@@ -1,0 +1,13 @@
+package GenerateRule;
+
+import java.io.File;
+
+/**
+ *Generate class GameObject 
+ **/
+public class GenerateGameObjectClass {
+	public void execute(String path){
+		File destinationFolder; // where Model is written to
+		destinationFolder = new File(path);
+	}
+}

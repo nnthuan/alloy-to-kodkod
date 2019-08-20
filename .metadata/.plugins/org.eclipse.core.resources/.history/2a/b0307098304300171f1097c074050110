@@ -1,0 +1,7 @@
+package GenerateRule;
+/**
+ *Generate class GameObject 
+ **/
+public class GenerateGameObjectClass {
+
+}

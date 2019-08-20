@@ -1,0 +1,12 @@
+package Controller;
+
+import java.util.List;
+import kodkod.ast.Formula;
+
+public abstract class Rule {
+  private List<GameObject> gameObjects;
+
+  abstract Formula execute();
+
+  abstract void addObject(GameObject gameObject);
+}

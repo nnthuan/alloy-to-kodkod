@@ -1,0 +1,21 @@
+package GenerateRule;
+
+import java.io.File;
+
+import javax.lang.model.element.Modifier;
+
+import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeSpec.Builder;
+
+/**
+ *Generate class GameObject 
+ **/
+public class GenerateGameObjectClass {
+	public void execute(String path){
+		File destinationFolder; // where Model is written to
+		destinationFolder = new File(path);
+		//builder class
+		Builder classBuilder = TypeSpec.classBuilder("GameObject").addModifiers(Modifier.PUBLIC,Modifier.ABSTRACT);
+		
+	}
+}

@@ -1,0 +1,100 @@
+package Controller;
+
+import controller.Rule;
+import java.lang.String;
+import java.util.List;
+import kodkod.ast.Formula;
+import kodkod.ast.Relation;
+import kodkod.ast.Variable;
+
+public class Rule4won extends Rule {
+  private List<String> listGameObjectName;
+
+  private Relation Time;
+
+  private Relation Fighter;
+
+  private Relation WON;
+
+  private Relation resource;
+
+  private Relation game_state;
+
+  public Rule4won() {
+    this.Time = Relation.unary("Time");
+    this.Fighter = Relation.unary("Fighter");
+    this.WON = Relation.unary("WON");
+    listGameObjectName.Add("Time");
+    listGameObjectName.Add("Fighter");
+    listGameObjectName.Add("WON");
+    this.resource = Relation.unary("resource");
+    this.game_state = Relation.unary("game_state");
+  }
+
+  public Rule4won(Relation time, Relation fighter, Relation won, Relation resource, Relation game_state) {
+    this.Time = time;
+    this.Fighter = fighter;
+    this.WON = won;
+    listGameObjectName.Add("Time");
+    listGameObjectName.Add("Fighter");
+    listGameObjectName.Add("WON");
+    this.resource = resource;
+    this.game_state = game_state;
+  }
+
+  public Relation getTime() {
+    return this.Time;
+  }
+
+  public void setTime(Relation time) {
+    this.Time = time;
+  }
+
+  public Relation getFighter() {
+    return this.Fighter;
+  }
+
+  public void setFighter(Relation fighter) {
+    this.Fighter = fighter;
+  }
+
+  public Relation getWON() {
+    return this.WON;
+  }
+
+  public void setWON(Relation won) {
+    this.WON = won;
+  }
+
+  public Relation getResource() {
+    return this.resource;
+  }
+
+  public void setResource(Relation resource) {
+    this.resource = resource;
+  }
+
+  public Relation getGame_state() {
+    return this.game_state;
+  }
+
+  public void setGame_state(Relation game_state) {
+    this.game_state = game_state;
+  }
+
+  @Variable
+  public Formula execute() {
+    private Variable t = Variable.unary("t");
+    private Variable f = Variable.unary("f");
+    private Formula f0 = f.join(resource.join(t).gte(5).implies(f.join(game_state.join(t).eq(WON))));
+    private Formula f1 = f0.forAll(t.oneOf(Time).and(f.oneOf(Fighter)));
+    return f1;
+  }
+
+  public void addGameObject(GameObject gameObject) {
+    if(gameObject != null){
+    if(!gameObjects.contains(gameObject)){
+    gameObjects.add(gameObject);
+    }}
+  }
+}
